@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 Console.WriteLine("Hello, World!");
 
-var days = AppDomain
+var puzzles = AppDomain
 	.CurrentDomain
 	.GetAssemblies()
 	.SelectMany(x => x.GetTypes())
@@ -16,23 +16,43 @@ var days = AppDomain
 	.Select(x => Create(x))
 	.ToList();
 
-foreach (var day in days)
+foreach (var puzzle in puzzles)
 {
-	OutputResult(day);
+	var puzzleName = puzzle.GetType().Name;
+	puzzle.IsExample = true;
+
+	Console.WriteLine($"Now solving {(puzzle.IsExample ? "Example: " : "")}: " + puzzleName);
+	OutputResult(puzzle, puzzleName);
+	puzzle.IsExample = false;
+	OutputResult(puzzle, puzzleName);
+	Console.WriteLine("***************************");
 }
 
 
-static void OutputResult<T, J>(IPuzzle<T, J> puzzle)
+static void OutputResult<T, J>(IPuzzle<T, J> puzzle, string puzzleName)
 {
 	var watch = new Stopwatch();
 	watch.Start();
 
-	Console.WriteLine("Now solving: " + puzzle.GetType().Name);
-	Console.WriteLine("First: " + puzzle.First() + " Should be: " + puzzle.FirstResult);
-	Console.WriteLine("Second: " + puzzle.Second() + " Should be: " + puzzle.SecondResult);
+	var firstValue = puzzle.First();
+	Console.WriteLine("First: " + firstValue + " Should be: " + puzzle.FirstResult);
+
+	ThrowIfNotSame(firstValue, puzzle.FirstResult,puzzleName);
+
+	var secondValue = puzzle.Second();
+	Console.WriteLine("Second: " + secondValue + " Should be: " + puzzle.SecondResult);
+	ThrowIfNotSame(secondValue, puzzle.SecondResult, puzzleName);
 
 	watch.Stop();
 	Console.WriteLine($"Time for {puzzle.GetType().Name}: " + watch.Elapsed);
+}
+static void ThrowIfNotSame<T>(T actual, T expected, string puzzleName)
+{
+		if (!actual.Equals(expected))
+		{
+			Console.Clear();
+			throw new Exception("Expected value: " + expected + " Actual value: " + actual + " On day: "+ puzzleName);
+		}
 }
 static IPuzzle Create(Type type)
 {

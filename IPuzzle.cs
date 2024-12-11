@@ -11,6 +11,7 @@
 
 		T FirstResult { get; }
 		P SecondResult { get; }
+		bool IsExample { get; set; }
 	}
 	public interface IPuzzle : IPuzzle<int, long>
 	{

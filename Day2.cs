@@ -2,7 +2,7 @@
 {
 	internal class Day2 : IPuzzle
 	{
-		public bool IsExample => false;
+		public bool IsExample {  get; set; }
 		public int FirstResult => this.IsExample ? 2 : 585;
 
 		//624 too low

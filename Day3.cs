@@ -2,7 +2,7 @@
 {
 	internal class Day3 : IPuzzle
 	{
-		public bool IsExample => false;
+		public bool IsExample { get; set; }
 		public int FirstResult => this.IsExample ? 161 : 175015740;
 
 		public long SecondResult => this.IsExample ? 48 : 112272912;

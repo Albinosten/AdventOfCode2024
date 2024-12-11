@@ -6,7 +6,7 @@ namespace AdventOfCode2024
 
 	internal class Day4 : IPuzzle
 	{
-		public bool IsExample => false;
+		public bool IsExample { get; set; }
 		public int FirstResult => this.IsExample ? 18 : 2613;
 
 		public long SecondResult => this.IsExample ? 9 : 1905;

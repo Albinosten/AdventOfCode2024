@@ -5,7 +5,7 @@
 	internal class DayX 
 	//: IPuzzle
 	{
-		public bool IsExample => true;
+		public bool IsExample { get; set; }
 		public int FirstResult => this.IsExample ? 0 : 0;
 
 		public long SecondResult => this.IsExample ? 0 : 0;
