@@ -1,9 +1,6 @@
 ﻿namespace AdventOfCode2024
 {
-
-
-	internal class DayX 
-	//: IPuzzle
+	internal class DayX : IPuzzle
 	{
 		public bool IsExample { get; set; }
 		public int FirstResult => this.IsExample ? 0 : 0;

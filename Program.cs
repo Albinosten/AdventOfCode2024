@@ -16,13 +16,15 @@ Console.WriteLine("Hello, World!");
 //	.Select(x => Create(x))
 //	.ToList();
 
-	Print(new Day1());
-	Print(new Day2());
-	Print(new Day3());
-	Print(new Day4());
-	Print(new Day5());
-	Print(new Day6());
-	//Print(new Day7());
+Print(new Day1());
+Print(new Day2());
+Print(new Day3());
+Print(new Day4());
+Print(new Day5());
+Print(new Day6());
+Print(new Day7());
+Print(new Day8());
+Print(new Day9());
 
 
 static void Print<T,J>(IPuzzle<T,J> puzzle)	
@@ -36,8 +38,6 @@ static void Print<T,J>(IPuzzle<T,J> puzzle)
 	OutputResult(puzzle, puzzleName);
 	Console.WriteLine("***************************");
 }
-
-
 
 static void OutputResult<T, J>(IPuzzle<T, J> puzzle, string puzzleName)
 {
@@ -56,14 +56,16 @@ static void OutputResult<T, J>(IPuzzle<T, J> puzzle, string puzzleName)
 	watch.Stop();
 	Console.WriteLine($"Time for {puzzle.GetType().Name}: " + watch.Elapsed);
 }
+
 static void ThrowIfNotSame<T>(T actual, T expected, string puzzleName)
 {
 		if (!actual.Equals(expected))
 		{
-			Console.Clear();
+			//Console.Clear();
 			throw new Exception("Expected value: " + expected + " Actual value: " + actual + " On day: "+ puzzleName);
 		}
 }
+
 static IPuzzle Create(Type type)
 {
 	return (IPuzzle)type.GetConstructor(Type.EmptyTypes).Invoke(null);
