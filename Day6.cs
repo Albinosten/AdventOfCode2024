@@ -22,31 +22,66 @@ namespace AdventOfCode2024
 				.Count()
 				;
 		}
-
+		private class Dummy
+		{
+			public (int x, int y) position { get; set; }
+			public bool result { get; set; }
+		}
 		public long Second()
 		{
-			this.Run(this.ParseInput(), out var pathOfGuard);
-			var result = 0;
+			var originMap = this.ParseInput();
+			this.Run(originMap, out var pathOfGuard);
 			var possibleBlocks = pathOfGuard
 				.Select(x => x.position)
 				.Distinct()
 				.Skip(1)
-				.ToList();
-				;
-			foreach (var position in possibleBlocks)
-			{
-				var map = this.ParseInput();
-				map[position.y][position.x] = '#';
-
-				if(this.Run(map, out var _))
+				.Select(x => new Dummy
 				{
-					result++;
+					position = x, result = false
+				})
+				.ToList();
+			;
+
+			Parallel.ForEach(possibleBlocks, dummy => //parallel foreach brings down time from 24s => 6s
+			{
+				var map = originMap.Select(x => x.ToList()).ToList();
+				map[dummy.position.y][dummy.position.x] = '#';
+
+				if (this.Run(map, out var a))
+				{
+					dummy.result = true;
 				}
-			}
+			});
 
-
-			return result;
+			return possibleBlocks.Where(x => x.result).Count();
 		}
+		//public long Second()
+		//{
+		//	var originMap = this.ParseInput();
+		//	this.Run(originMap, out var pathOfGuard);
+		//	var result = 0;
+		//	var possibleBlocks = pathOfGuard
+		//		.Select(x => x.position)
+		//		.Distinct()
+		//		.Skip(1)
+		//		.ToList();
+		//		;
+		//	long totalVisitedPoints = 0;
+		//	foreach (var position in possibleBlocks)
+		//	{
+		//		var map = originMap.Select(x => x.ToList()).ToList();
+		//		map[position.y][position.x] = '#';
+
+		//		if(this.Run(map, out var a))
+		//		{
+		//			result++;
+		//		}
+		//		totalVisitedPoints+= a.Count;
+		//	}
+		//	Console.WriteLine(totalVisitedPoints);
+
+		//	return result;
+		//}
 		private bool Run(List<List<char>> map, out List<(Direction direction, (int x, int y) position)> pathOfGuard)
 		{
 			pathOfGuard = new List<(Direction direction, (int x, int y) position)>

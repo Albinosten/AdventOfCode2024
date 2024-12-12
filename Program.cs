@@ -7,16 +7,25 @@ using System.Windows.Input;
 
 Console.WriteLine("Hello, World!");
 
-var puzzles = AppDomain
-	.CurrentDomain
-	.GetAssemblies()
-	.SelectMany(x => x.GetTypes())
-	.Where(x => typeof(IPuzzle).IsAssignableFrom(x))
-	.Where(x => x.IsClass)
-	.Select(x => Create(x))
-	.ToList();
+//var puzzles = AppDomain
+//	.CurrentDomain
+//	.GetAssemblies()
+//	.SelectMany(x => x.GetTypes())
+//	.Where(x => typeof(IPuzzle).IsAssignableFrom(x))
+//	.Where(x => x.IsClass)
+//	.Select(x => Create(x))
+//	.ToList();
 
-foreach (var puzzle in puzzles)
+	Print(new Day1());
+	Print(new Day2());
+	Print(new Day3());
+	Print(new Day4());
+	Print(new Day5());
+	Print(new Day6());
+	//Print(new Day7());
+
+
+static void Print<T,J>(IPuzzle<T,J> puzzle)	
 {
 	var puzzleName = puzzle.GetType().Name;
 	puzzle.IsExample = true;
@@ -27,6 +36,7 @@ foreach (var puzzle in puzzles)
 	OutputResult(puzzle, puzzleName);
 	Console.WriteLine("***************************");
 }
+
 
 
 static void OutputResult<T, J>(IPuzzle<T, J> puzzle, string puzzleName)
