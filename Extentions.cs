@@ -59,4 +59,72 @@ namespace AdventOfCode2024
 		Three,
 		Ten,
 	}
+	public enum Direction { Up, Down, Left, Right }
+
+	public class Helper
+	{
+		public static Direction[] GetAllDirections() =>
+		[	
+			Direction.Up,
+			Direction.Down,
+			Direction.Left,
+			Direction.Right,
+		];
+		public static bool WithinBounds<T>((int x, int y) pos, List<List<T>> map)
+		{
+			return pos.x >= 0
+				&& pos.y >= 0
+				&& pos.y < map.Count
+				&& pos.x < map[0].Count;
+		}
+		public static (int x, int y) GetNextPosition(Direction direction, (int x, int y) position) => direction switch
+		{
+			Direction.Up => (position.x, position.y - 1),
+			Direction.Down => (position.x, position.y + 1),
+			Direction.Left => (position.x - 1, position.y),
+			Direction.Right => (position.x + 1, position.y),
+			_ => throw new InvalidOperationException(),
+		};
+
+		public static void PrintMap(List<List<char>> map, List<(int x, int y)> pos)
+		{
+			for (var y = 0; y < map.Count; y++)
+			{
+				for (var x = 0; x < map[y].Count(); x++)
+				{
+					var value = map[y][x];
+					if (pos.Contains((x, y)))
+					{
+						Console.Write('*');
+
+					}
+					else if(value == '.')
+					{
+						Console.Write(' ');
+					}
+					else if (value == '#')
+					{
+						Console.Write(' ');
+					}
+					else
+					{
+						Console.Write(value);
+						//Console.Write(' ');
+					}
+				}
+				Console.WriteLine();
+			}
+		}
+		public static void PrintMap<T>(List<List<T>> map)
+		{
+			for (var y = 0; y < map.Count; y++)
+			{
+				for (var x = 0; x < map[y].Count(); x++)
+				{
+					Console.Write(map[y][x]);
+				}
+				Console.WriteLine();
+			}
+		}
+	}
 }

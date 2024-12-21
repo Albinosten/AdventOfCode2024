@@ -7,7 +7,7 @@ namespace AdventOfCode2024
 		public bool IsExample { get; set; }
 		public int FirstResult => this.IsExample ? 55312 : 224529;
 
-		public long SecondResult => this.IsExample ? 0 : 0;
+		public long SecondResult => this.IsExample ? 0 : 266820198587914;
 
 		public string path => this.IsExample
 			? $"Inputs/{this.GetType().Name}_TEMP.txt"

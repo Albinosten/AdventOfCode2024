@@ -15,21 +15,36 @@ Console.WriteLine("Hello, World!");
 //	.Where(x => x.IsClass)
 //	.Select(x => Create(x))
 //	.ToList();
+var watch = new Stopwatch();
+watch.Start();
 
-//Print(new Day1());
-//Print(new Day2());
-//Print(new Day3());
-//Print(new Day4());
-//Print(new Day5());
-//Print(new Day6());
-//Print(new Day7());
-//Print(new Day8());
-//Print(new Day9());
-//Print(new Day10());
-//Print(new Day11());
-Print(new Day12());
+//var a = new Day16()
+//{
+//	IsExample = true
+//};
+//Console.WriteLine( a.Second());
+
+
+Print(new Day16());
+Print(new Day15());
+Print(new Day14());
 Print(new Day13());
+Print(new Day12());
+Print(new Day11());
+Print(new Day10());
+Print(new Day9());
+Print(new Day8());
+Print(new Day7());
+Print(new Day6());
+Print(new Day5());
+Print(new Day4());
+Print(new Day3());
+Print(new Day2());
+Print(new Day1());
 
+
+watch.Stop();
+Console.WriteLine($"Total time: " + watch.Elapsed);
 static void Print<T,J>(IPuzzle<T,J> puzzle)	
 {
 	var puzzleName = puzzle.GetType().Name;
@@ -62,10 +77,10 @@ static void OutputResult<T, J>(IPuzzle<T, J> puzzle, string puzzleName)
 
 static void ThrowIfNotSame<T>(T actual, T expected, string puzzleName)
 {
-		if (!actual.Equals(expected))
-		{
+	if (!actual.Equals(expected))
+	{
 		//Console.Clear();
-		//throw new Exception("Expected value: " + expected + " Actual value: " + actual + " On day: " + puzzleName);
+		throw new Exception("Expected value: " + expected + " Actual value: " + actual + " On day: " + puzzleName);
 	}
 }
 

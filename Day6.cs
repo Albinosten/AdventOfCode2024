@@ -93,7 +93,7 @@ namespace AdventOfCode2024
 			var direction = Direction.Up;
 			while (true)
 			{
-				var nextPos = this.GetNextPosition(direction, position);
+				var nextPos = Helper.GetNextPosition(direction, position);
 
 				if (nextPos.x < 0
 					|| nextPos.y < 0
@@ -130,14 +130,6 @@ namespace AdventOfCode2024
 			Direction.Down => Direction.Left,
 			Direction.Left => Direction.Up,
 		};
-		private (int x, int y) GetNextPosition(Direction direction, (int x, int y) position) => direction switch
-		{
-			Direction.Up => (position.x, position.y - 1),
-			Direction.Down => (position.x, position.y + 1),
-			Direction.Left => (position.x - 1, position.y),
-			Direction.Right => (position.x + 1, position.y),
-		};
-		
 		private List<List<char>> ParseInput()
 		{
 			var allLines = File
@@ -161,13 +153,6 @@ namespace AdventOfCode2024
 			}
 
 			return map;
-		}
-		private enum Direction
-		{
-			Up,
-			Down,
-			Left,
-			Right
 		}
 	}
 }

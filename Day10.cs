@@ -72,16 +72,10 @@ namespace AdventOfCode2024
 		}
 		private bool IsMovePossible((int x, int y) currentPos, (int x, int y) nextPos, List<List<int>> map)
 		{
-			return this.WithinBounds(nextPos, map) 
+			return Helper.WithinBounds(nextPos, map) 
 				&& map[currentPos.y][currentPos.x] + 1 == map[nextPos.y][nextPos.x];
 		}
-		private bool WithinBounds((int x, int y) pos, List<List<int>> map)
-		{
-			return pos.x >= 0
-				&& pos.y >= 0
-				&& pos.y < map.Count
-				&& pos.x < map[0].Count;
-		}
+		
 		private List<(int x, int y)> GetPossibleMove((int x, int y) startPos)
 		{
 			return 
