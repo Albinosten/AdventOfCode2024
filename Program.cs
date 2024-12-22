@@ -22,9 +22,9 @@ var a = new Day18()
 {
 	//IsExample = true
 };
-Console.WriteLine(a.First());
+// Console.WriteLine(a.First());
 
-//Print(new Day18());
+Print(new Day18());	
 //Print(new Day17());
 //Print(new Day16());
 //Print(new Day15());
