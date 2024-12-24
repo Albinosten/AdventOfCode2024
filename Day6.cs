@@ -55,33 +55,6 @@ namespace AdventOfCode2024
 
 			return possibleBlocks.Where(x => x.result).Count();
 		}
-		//public long Second()
-		//{
-		//	var originMap = this.ParseInput();
-		//	this.Run(originMap, out var pathOfGuard);
-		//	var result = 0;
-		//	var possibleBlocks = pathOfGuard
-		//		.Select(x => x.position)
-		//		.Distinct()
-		//		.Skip(1)
-		//		.ToList();
-		//		;
-		//	long totalVisitedPoints = 0;
-		//	foreach (var position in possibleBlocks)
-		//	{
-		//		var map = originMap.Select(x => x.ToList()).ToList();
-		//		map[position.y][position.x] = '#';
-
-		//		if(this.Run(map, out var a))
-		//		{
-		//			result++;
-		//		}
-		//		totalVisitedPoints+= a.Count;
-		//	}
-		//	Console.WriteLine(totalVisitedPoints);
-
-		//	return result;
-		//}
 		private bool Run(List<List<char>> map, out List<(Direction direction, (int x, int y) position)> pathOfGuard)
 		{
 			pathOfGuard = new List<(Direction direction, (int x, int y) position)>

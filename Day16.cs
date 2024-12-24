@@ -13,10 +13,7 @@ namespace AdventOfCode2024
 		public string path => this.IsExample
 			? $"Inputs/{this.GetType().Name}_TEMP.txt"
 			: $"Inputs/{this.GetType().Name}.txt";
-		int GetManhattanDistance((int x, int y) pos1, (int x, int y) pos2)
-		{
-			return Math.Abs(pos1.x - pos2.x) + Math.Abs(pos1.y - pos2.y);
-		}
+		
 		public int First()
 		{
 			return this.Solve().minScore;
@@ -28,9 +25,9 @@ namespace AdventOfCode2024
 		}
 		public long Second()
 		{
-			return this.Solve(Part.Two).uniquePositions.Count;
+			return this.Solve(this.Solve().minScore, Part.Two).uniquePositions.Count;
 		}
-		(int minScore, List<(int x, int y)>uniquePositions) Solve(Part part = Part.One)
+		(int minScore, List<(int x, int y)>uniquePositions) Solve(int minScore = int.MaxValue, Part part = Part.One)
 		{
 			var (map, startPos, endPos) = this.ParseInput();
 
@@ -40,7 +37,7 @@ namespace AdventOfCode2024
 			var closesDistanceVector = new Dictionary<(int x, int y), long>();
 			
 			var allBestRouts = new HashSet<(int x, int y)>();
-			int minScore = int.MaxValue;
+			
 			while (q.Count > 0)
 			{
 				var n = q.Dequeue();
@@ -56,15 +53,14 @@ namespace AdventOfCode2024
 				}
 				closesDistanceVector[n.pos] = n.score;
 
-				if (n.pos == endPos && n.score == this.FirstResult)
+				
+				if (n.pos == endPos && minScore >= n.score)
 				{
-					foreach (var c in n.visited) 
+					foreach (var c in n.visited)
 					{
 						allBestRouts.Add(c);
 					}
-				}
-				if (n.pos == endPos && minScore > n.score)
-				{
+					
 					minScore = n.score;
 					continue;
 				}

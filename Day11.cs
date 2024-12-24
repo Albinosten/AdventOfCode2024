@@ -7,7 +7,7 @@ namespace AdventOfCode2024
 		public bool IsExample { get; set; }
 		public int FirstResult => this.IsExample ? 55312 : 224529;
 
-		public long SecondResult => this.IsExample ? 0 : 266820198587914;
+		public long SecondResult => this.IsExample ? 65601038650482 : 266820198587914;
 
 		public string path => this.IsExample
 			? $"Inputs/{this.GetType().Name}_TEMP.txt"
@@ -19,7 +19,6 @@ namespace AdventOfCode2024
 
 		public long Second()
 		{
-			if (this.IsExample) { return this.SecondResult; }
 			return this.Solve(75);
 		}
 

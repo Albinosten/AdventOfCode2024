@@ -35,7 +35,7 @@ namespace AdventOfCode2024
 				{
 					trys++;
 					long sum = item.numbers.First();
-					var binary = ExtentionsAndHelpers
+					var binary = Helper
 						.ToBase(i
 							, part == Part.One
 							? Base.Two
