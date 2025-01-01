@@ -139,18 +139,12 @@ namespace AdventOfCode2024
 		}
 		public long Second()
 		{
-		if(this.IsExample){ return 0; }
 			var guards = this.ParseInput();
 
 			for (int time = 0; time < this.space.width * this.space.height; time++)
 			{
-				//Console.WriteLine();
-				//Console.WriteLine($"After {time} Seconds");
-
-
 				if (this.HasStraightLine(10, guards.Select(x => x.pos).ToList()))
 				{
-					//Print(guards);
 					return time;
 				}
 				for (int g = 0; g < guards.Count; g++)

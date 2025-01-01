@@ -7,23 +7,6 @@ using System.Threading.Tasks;
 
 namespace AdventOfCode2024
 {
-	public static class ExtentionsAndHelpers
-	{
-		public static List<T> ExceptElementAt<T>(this List<T> list, int element)
-		{
-			var result = new List<T>(list);
-
-			result.RemoveAt(element);
-
-			return result;
-		}
-		public static (int x, int y) Add(this (int x, int y) first, (int x, int y) second)
-		{
-			return (first.x + second.x, first.y + second.y);
-		}
-		
-		
-	}
 	public enum Part
 	{
 		One,
@@ -35,10 +18,15 @@ namespace AdventOfCode2024
 		Three,
 		Ten,
 	}
+	public interface Clonable<T>
+	{
+		T Clone();
+	}
 	public enum Direction { Up, Down, Left, Right }
 
 	public class Helper
 	{
+		
 		public static string ToBase(int value, Base toBase) => toBase switch
 		{
 			Base.Two => IntToString(value, ['0', '1']),
@@ -112,7 +100,8 @@ namespace AdventOfCode2024
 		];
 		public static bool WithinBounds<T>((int x, int y) pos, List<List<T>> map)
 		{
-			return WithinBounds(pos, (map.Count, map[0].Count));
+			//return WithinBounds(pos, (map.Count, map[0].Count));
+			return WithinBounds(pos, (map[0].Count, map.Count));
 		}
 		public static int GetManhattanDistance((int x, int y) pos1, (int x, int y) pos2)
 		{
@@ -171,10 +160,10 @@ namespace AdventOfCode2024
 					{
 						Console.Write(' ');
 					}
-					else if (value == '#')
-					{
-						Console.Write(' ');
-					}
+					//else if (value == '#')
+					//{
+					//	Console.Write(' ');
+					//}
 					else
 					{
 						Console.Write(value);
@@ -194,6 +183,51 @@ namespace AdventOfCode2024
 				}
 				Console.WriteLine();
 			}
+		}
+		public static Dictionary<(int x, int y), int> InitalizeShortestPathVector(int xMax, int yMax)
+		{
+			var v = new Dictionary<(int x, int y), int>();
+			for (int y = 0; y < yMax + 1; y++)
+			{
+				for (int x = 0; x < xMax + 1; x++)
+				{
+					v.Add((x, y), int.MaxValue);
+				}
+			}
+			return v;
+		}
+		public static List<string> CartesianProduct(List<List<string>> lists)
+		{
+			List<string> result = [""];
+			foreach (var list in lists)
+			{
+				result = result.SelectMany(prefix => list.Select(item => prefix + item)).ToList();
+			}
+			return result;
+		}
+	}
+	class MultiValueDictionary<TKey, TValue>  // no (collection) base class
+	{
+		private Dictionary<TKey, List<TValue>> _data = new Dictionary<TKey, List<TValue>>();
+
+		public void Add(TKey k, TValue v)
+		{
+			if (_data.ContainsKey(k))
+				_data[k].Add(v);
+			else
+				_data.Add(k, [v]);
+		}
+		public bool ContainsKey(TKey k)
+		{
+			return _data.ContainsKey(k);
+		}
+		public List<TValue> Get(TKey k)
+		{
+			var temp = _data[k].DistinctList();
+			_data.Remove(k);
+			_data.Add(k, temp);
+
+			return _data[k];
 		}
 	}
 }

@@ -18,30 +18,35 @@ Console.WriteLine("Hello, World!");
 var watch = new Stopwatch();
 watch.Start();
 
-var a = new Day18()
-{
-	//IsExample = true
-};
-// Console.WriteLine(a.First());
+//var a = new Day20()
+//{
+//	IsExample = true
+//};
+//Console.WriteLine(a.First());
+//Console.WriteLine(a.Second());
 
-Print(new Day18());	
-//Print(new Day17());
-//Print(new Day16());
-//Print(new Day15());
-//Print(new Day14());
-//Print(new Day13());
-//Print(new Day12());
-//Print(new Day11());
-//Print(new Day10());
-//Print(new Day9());
-//Print(new Day8());
-//Print(new Day7());
-//Print(new Day6());
-//Print(new Day5());
-//Print(new Day4());
-//Print(new Day3());
-//Print(new Day2());
-//Print(new Day1());
+Print(new Day22());
+Print(new Day21());
+Print(new Day20());
+Print(new Day19());
+Print(new Day18());
+Print(new Day17());
+Print(new Day16());
+Print(new Day15());
+Print(new Day14());
+Print(new Day13());
+Print(new Day12());
+Print(new Day11());
+Print(new Day10());
+Print(new Day9());
+Print(new Day8());
+Print(new Day7());
+Print(new Day6());
+Print(new Day5());
+Print(new Day4());
+Print(new Day3());
+Print(new Day2());
+Print(new Day1());
 
 
 watch.Stop();

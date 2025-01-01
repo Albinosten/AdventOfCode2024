@@ -5,7 +5,7 @@ internal class Day18 : IPuzzle<int,string>
 {
 	public bool IsExample { get; set; }
 	public int FirstResult => this.IsExample ? 22 : 432;
-	public string SecondResult => this.IsExample ? "1,0" : "";
+	public string SecondResult => this.IsExample ? "6,1" : "56,27";
 	private int startBytes => this.IsExample ? 12 : 1024;
 	private (int width, int height) space => this.IsExample ? (6, 6) : (70, 70);
 
@@ -19,14 +19,14 @@ internal class Day18 : IPuzzle<int,string>
 		return this.Solve(this.ReadBytes(this.startBytes));
 	}
 
-		int Solve(List<(int x, int y)>bytes)
+		int Solve(List<(int x, int y)>bytes, Part part = Part.One)
 		{
 			var map = this.CreateMap(bytes);
 
 			var q = new Queue<(List<(int x, int y)> visited, (int x, int y) pos, int score)>();
 			q.Enqueue((new List<(int x, int y)>(), (0,0), 0));
 
-			var closesDistanceVector = this.InitalizeShortestPathVector();
+			var closesDistanceVector = Helper.InitalizeShortestPathVector(this.space.width, this.space.height);
 			var minScore = int.MaxValue;
 			while (q.Count > 0)
 			{
@@ -45,7 +45,8 @@ internal class Day18 : IPuzzle<int,string>
 				if (n.pos == this.space && minScore >= n.score)
 				{
 					minScore = n.score;
-					Helper.PrintMap(map,n.visited);
+					//Helper.PrintMap(map,n.visited);
+					if(part == Part.Two){ return n.score; }
 
 					continue;
 				}
@@ -78,27 +79,16 @@ internal class Day18 : IPuzzle<int,string>
 		var bytes = this.ReadBytes(int.MaxValue);
 		for(int i = startBytes; i < bytes.Count;i++)
 		{
-			var score = this.Solve(bytes.Take(i).ToList());
-			if(score == int.MaxValue)
+			var score = this.Solve(bytes.Take(i+1).ToList());
+			if (score == int.MaxValue)
 			{
-				return string.Join(',',  bytes[i]);
+				return string.Join(',', new[] { bytes[i].x, bytes[i].y });
 			}
 		}
 
 		return "";
 	}
-	private Dictionary<(int x, int y), int> InitalizeShortestPathVector()
-	{
-		var v = new Dictionary<(int x, int y), int>();
-		for (int y = 0; y < space.height + 1; y++)
-		{
-			for (int x = 0; x < space.width + 1; x++)
-			{
-				v.Add((x, y), int.MaxValue);
-			}
-		}
-		return v;
-	}
+	
 	void printDistanceVector(Dictionary<(int x, int y), int> vector, List<List<bool>> map)
 	{
 		for (var y = 0; y < map.Count; y++)

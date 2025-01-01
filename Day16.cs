@@ -97,6 +97,7 @@ namespace AdventOfCode2024
 			return (minScore, allBestRouts.ToList());
 		}
 
+
 		private (List<List<char>> map, (int x, int y) startPos, (int x, int y) endPos) ParseInput()
 		{
 			var allLines = File.ReadAllLines(this.path);
