@@ -1,233 +1,83 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections;
 
 namespace AdventOfCode2024
 {
-	public enum Part
+	public static class Extentions
 	{
-		One,
-		Two,
-	}
-	public enum Base
-	{
-		Two,
-		Three,
-		Ten,
-	}
-	public interface Clonable<T>
-	{
-		T Clone();
-	}
-	public enum Direction { Up, Down, Left, Right }
-
-	public class Helper
-	{
-		
-		public static string ToBase(int value, Base toBase) => toBase switch
+		public static List<List<T>> GetPermutations<T>(this IEnumerable<T> list, int length)
 		{
-			Base.Two => IntToString(value, ['0', '1']),
-			Base.Three => IntToString(value, ['0', '1', '2']),
-			Base.Ten => value.ToString(),
-			_ => throw new NotImplementedException(),
-		};
-		public static long FromBase8ToBase10(string octalNumber)
-		{
-			long decimalNumber = 0;
+			if (length == 1) return list.Select(t => new T[] { t }.ToList()).ToList();
 
-			// Iterate through each digit of the octal number
-			for (int i = 0; i < octalNumber.Length; i++)
-			{
-				// Convert the character to a digit (0-7)
-				int digit = octalNumber[i] - '0';
-
-				// Validate if the digit is valid for base 8
-				if (digit < 0 || digit > 7)
-				{
-					throw new ArgumentException("Invalid octal number: Contains digits outside the range 0-7.");
-				}
-
-				// Calculate the power of 8 for the current position
-				int position = octalNumber.Length - 1 - i;
-				decimalNumber += digit * (long)Math.Pow(8, position);
-			}
-
-			return decimalNumber;
+			return GetPermutations(list, length - 1)
+				.SelectMany(t => list.Where(e => !t.Contains(e)),
+					(t1, t2) => t1.Concat(new T[] { t2 }).ToList()).ToList();
 		}
-		private static string IntToString(int value, char[] baseChars)
+		public static List<List<T>>GetVariations<T>(this List<T> list)
 		{
-			// 32 is the worst cast buffer size for base 2 and int.MaxValue
-			int i = 32;
-			char[] buffer = new char[i];
-			int targetBase = baseChars.Length;
+			var result = new List<List<T>>();
 
-			do
+			for (int i = 0; i < Math.Pow(2, list.Count); i++)
 			{
-				buffer[--i] = baseChars[value % targetBase];
-				value = value / targetBase;
-			}
-			while (value > 0);
+				var row  = new List<T>();
+				BitArray b = new BitArray(new int[] { i });
+				bool[] bits = new bool[b.Count];
+				b.CopyTo(bits, 0);
 
-			char[] result = new char[32 - i];
-			Array.Copy(buffer, i, result, 0, 32 - i);
-
-			return new string(result);
-		}
-		public static bool ListsAreEqual<T>(List<T> a, List<T> b)
-		{
-			if (a.Count != b.Count) { return false; }
-			{
-				for (int i = 0; i < a.Count; i++)
+				for(int j = 0; j < list.Count; j++)
 				{
-					if (!a[i].Equals(b[i]))
-					//if (!EqualityComparer<T>.Default.Equals(a[i], b[i]))
+					if(bits[j])
 					{
-						return false;
+						row.Add(list[j]);
 					}
 				}
+				result.Add(row);
 			}
-			return true;
-		}
-		public static Direction[] GetAllDirections() =>
-		[	
-			Direction.Up,
-			Direction.Down,
-			Direction.Left,
-			Direction.Right,
-		];
-		public static bool WithinBounds<T>((int x, int y) pos, List<List<T>> map)
-		{
-			//return WithinBounds(pos, (map.Count, map[0].Count));
-			return WithinBounds(pos, (map[0].Count, map.Count));
-		}
-		public static int GetManhattanDistance((int x, int y) pos1, (int x, int y) pos2)
-		{
-			return Math.Abs(pos1.x - pos2.x) + Math.Abs(pos1.y - pos2.y);
-		}
-		public static bool WithinBounds((int x, int y) pos, (int x, int y) limit)
-		{
-			return pos.x >= 0
-				&& pos.y >= 0
-				&& pos.y < limit.y
-				&& pos.x < limit.x;
-		}
-		public static (int x, int y) GetNextPosition(Direction direction, (int x, int y) position) => direction switch
-		{
-			Direction.Up => (position.x, position.y - 1),
-			Direction.Down => (position.x, position.y + 1),
-			Direction.Left => (position.x - 1, position.y),
-			Direction.Right => (position.x + 1, position.y),
-			_ => throw new InvalidOperationException(),
-		};
 
-		public static void PrintMap(List<List<bool>> map, List<(int x, int y)> pos)
-		{
-			Console.Clear();
-			for (var y = 0; y < map.Count; y++)
-			{
-				for (var x = 0; x < map[y].Count(); x++)
-				{
-					if (pos.Contains((x, y)))
-					{
-						Console.Write('O');
-					}
-					else{
-
-						var value = map[y][x];
-						Console.Write(value ? '#' : '.');
-					}
-				}
-				Console.WriteLine();
-			}
-			Console.WriteLine();
-		}
-		public static void PrintMap(List<List<char>> map, List<(int x, int y)> pos)
-		{
-			for (var y = 0; y < map.Count; y++)
-			{
-				for (var x = 0; x < map[y].Count(); x++)
-				{
-					var value = map[y][x];
-					if (pos.Contains((x, y)))
-					{
-						Console.Write('*');
-
-					}
-					else if(value == '.')
-					{
-						Console.Write(' ');
-					}
-					//else if (value == '#')
-					//{
-					//	Console.Write(' ');
-					//}
-					else
-					{
-						Console.Write(value);
-						//Console.Write(' ');
-					}
-				}
-				Console.WriteLine();
-			}
-		}
-		public static void PrintMap<T>(List<List<T>> map)
-		{
-			for (var y = 0; y < map.Count; y++)
-			{
-				for (var x = 0; x < map[y].Count(); x++)
-				{
-					Console.Write(map[y][x]);
-				}
-				Console.WriteLine();
-			}
-		}
-		public static Dictionary<(int x, int y), int> InitalizeShortestPathVector(int xMax, int yMax)
-		{
-			var v = new Dictionary<(int x, int y), int>();
-			for (int y = 0; y < yMax + 1; y++)
-			{
-				for (int x = 0; x < xMax + 1; x++)
-				{
-					v.Add((x, y), int.MaxValue);
-				}
-			}
-			return v;
-		}
-		public static List<string> CartesianProduct(List<List<string>> lists)
-		{
-			List<string> result = [""];
-			foreach (var list in lists)
-			{
-				result = result.SelectMany(prefix => list.Select(item => prefix + item)).ToList();
-			}
+			
 			return result;
 		}
-	}
-	class MultiValueDictionary<TKey, TValue>  // no (collection) base class
-	{
-		private Dictionary<TKey, List<TValue>> _data = new Dictionary<TKey, List<TValue>>();
+		public static IEnumerable<T> TakeWhile<T>(this IEnumerable<T> source, Func<T, bool> predicate, bool inclusive)
+		{
+			foreach (T item in source)
+			{
+				if (predicate(item))
+				{
+					yield return item;
+				}
+				else
+				{
+					if (inclusive) yield return item;
 
-		public void Add(TKey k, TValue v)
-		{
-			if (_data.ContainsKey(k))
-				_data[k].Add(v);
-			else
-				_data.Add(k, [v]);
+					yield break;
+				}
+			}
 		}
-		public bool ContainsKey(TKey k)
+		public static List<T> ExceptElementAt<T>(this List<T> list, int element)
 		{
-			return _data.ContainsKey(k);
-		}
-		public List<TValue> Get(TKey k)
-		{
-			var temp = _data[k].DistinctList();
-			_data.Remove(k);
-			_data.Add(k, temp);
+			var result = new List<T>(list);
 
-			return _data[k];
+			result.RemoveAt(element);
+
+			return result;
 		}
+		public static (int x, int y) Add(this (int x, int y) first, (int x, int y) second)
+		{
+			return (first.x + second.x, first.y + second.y);
+		}
+		public static List<T> CloneList<T>(this List<T> list)
+			where T : Clonable<T>
+		{
+			return list.Select(x => x.Clone()).ToList();
+		}
+		public static List<T> DistinctList<T>(this List<T> list)
+		{
+			return list.Distinct().ToList();
+		}
+		public static List<T> DistinctList<T>(this IEnumerable<T> list)
+		{
+			return list.Distinct().ToList();
+		}
+
+
 	}
 }

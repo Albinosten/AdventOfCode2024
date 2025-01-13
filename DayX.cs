@@ -1,5 +1,6 @@
 ﻿namespace AdventOfCode2024
 {
+	
 	internal class DayX : IPuzzle
 	{
 		public bool IsExample { get; set; }
