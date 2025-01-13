@@ -88,7 +88,7 @@ static void ThrowIfNotSame<T>(T actual, T expected, string puzzleName)
 	if (!actual.Equals(expected))
 	{
 		//Console.Clear();
-		//throw new Exception("Expected value: " + expected + " Actual value: " + actual + " On day: " + puzzleName);
+		throw new Exception("Expected value: " + expected + " Actual value: " + actual + " On day: " + puzzleName);
 	}
 }
 

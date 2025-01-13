@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -9,7 +10,7 @@ namespace AdventOfCode2024
 		public bool IsExample { get; set; }
 		public long FirstResult => this.IsExample ? 2024 : 63168299811048;
 
-		public string SecondResult => this.IsExample ? "" : "";
+		public string SecondResult => this.IsExample ? "" : "dwp,ffj,gjh,jdr,kfm,z08,z22,z31";
 
 		public string path => this.IsExample
 			? $"Inputs/{this.GetType().Name}_TEMP.txt"
@@ -20,112 +21,85 @@ namespace AdventOfCode2024
 			return this.GetValueFromGates(this.Filter(gates,'z'));
 		}
 
-		public string Second() 
+		public string Second()
 		{
 			if(this.IsExample){ return this.SecondResult; }
 			var gates = this.ParseInput();
-			var xvalue = this.GetValueFromGates(this.Filter(gates, 'x'));
-			var yvalue = this.GetValueFromGates(this.Filter(gates, 'y'));
 
 			var gatesDictionary = gates.ToDictionary(x => x.Name);
+			//this.TryGate(gatesDictionary["z40"], gatesDictionary);
 
-			var shouldBe = xvalue + yvalue;
-			var faultyZGates = gates
-				.Where(x => x.Name[0] == 'z')
-				.Where(x => x.Type != Types.XOR)
-				.Take(3)
-				.ToList();
-			var zGates = gates
-				.Where(x => x.Name[0] == 'z')
-				.ToList();
-			var gatesWithXORAndNotInZ = gates
-				.Where(x => x.Type == Types.XOR)
-				.Where(x => x.Name[0] != 'z')
-				.ToList();
-			var gatesNotInZ = gates
-				.Where(x => x.Name[0] != 'z')
-				.ToList();
-
-
-			var a = this.TryGate(gatesDictionary["z45"], gatesDictionary);
-
-
-			var result = this.Solve(gates, [],0);
-			var keys = result.Select(x => GetKey(x)).OrderBy(x => x).ToList();
-
-
-			return keys.FirstOrDefault() ?? "";
+			return this.Solve(gates,[])
+				.Select(GetKey)
+				.OrderBy(x => x)
+				.ToList()
+				.FirstOrDefault() 
+				?? "";
 		}
-
-		List<List<string>> Solve(List<Gate> gates, HashSet<string> swapKey, int zMin)
+		long tries = 0;
+		List<List<string>> Solve(List<Gate> gates, HashSet<string> swapKey)
 		{
-			tries++;
-			if(tries % 1 == 0){ Console.WriteLine(tries); }
 			var gatesDictionary = gates.ToDictionary(x => x.Name);
 			var zGates = this.Filter(gates, 'z');
-			//var gatesWithoutCorrectZ = gates
-			//	.Where(x => !(x.Name[0] == 'z' && x.Type == Types.XOR)
-			//	).ToList();
-
+			
 			if (this.CheckUpToNumber(zGates.Max(x => x.Number), gatesDictionary))
 			{
-				Console.WriteLine("Key found: " + this.GetKey(swapKey.ToList()));
 				return [swapKey.ToList()];
 			}
-			if (swapKey.Count >= 8){ return []; }
-
+			
 			var result = new List<List<string>>();
+			var problemFree = true;
 			for (var z = 0; z < zGates.Count; z++)
 			{
 				var zGate = zGates[z];
-				if (!this.TryGate(zGate, gatesDictionary))
+				if (problemFree && !this.TryGate(zGate, gatesDictionary))
 				{
-					Console.WriteLine("z: " + z);
 					//swap
+					problemFree = false;
 					for(int i0 = 0; i0 < gates.Count; i0++)
 					{
 						for (int i1 = i0; i1 < gates.Count; i1++)
 						{
+							tries++;
+							if(tries % 1000 == 0)
+							{
+								Console.WriteLine(tries);
+							}
 							var clones = this.Clone(gates);
 							var clonesDictionary = clones.ToDictionary(x => x.Name);
 							
-							if(clones[i0].Name == "z08" && clones[i1].Name == "ffj")
-							{
-							}
-							
 							this.swap(clones[i0], clones[i1]);
-							//CheckUpToNumber
 							if (this.CheckUpToNumber((z+1), clonesDictionary)
 								&& !swapKey.Contains(clones[i0].Name)
 								&& !swapKey.Contains(clones[i1].Name)
 								&& clones[i0].Name != clones[i1].Name
-
 							)
 							{
 								//if okey keep on going untill done;
 								var newSwapKey = swapKey.ToHashSet();
 								newSwapKey.Add(clones[i0].Name);
 								newSwapKey.Add(clones[i1].Name);
-								result.AddRange(this.Solve(clones, newSwapKey,z+1));
+								
+								result.AddRange(this.Solve(clones, newSwapKey));
 							}
 						}
 					}
 				}
 			}
 
-			if(this.CheckUpToNumber(zGates.Max(x => x.Number), gatesDictionary))
-			{
-				result.Add(swapKey.ToList()); 
-			}
-
 			return result;
-
 		}
 
 
 
 
-
+		void Reset(List<Gate> gates)
+		{
+			for(int i = 0; i <  gates.Count; i++)
+			{
+				gates[i].Executed = false;
+			}
+		}
 		//run to make sure swaping dont destroy anything before
 		bool CheckUpToNumber(int number, Dictionary<string, Gate> gatesDictionary)
 		{
@@ -153,7 +127,6 @@ namespace AdventOfCode2024
 		{
 			if(gate.Number < 45)
 			{
-
 				var xGate = allGAtes[$"x{gate.Number.ToString().PadLeft(2, '0')}"];
 				var yGate = allGAtes[$"y{gate.Number.ToString().PadLeft(2, '0')}"];
 				if(gate.Number > 0)
@@ -169,7 +142,7 @@ namespace AdventOfCode2024
 			var xGate_1 = allGAtes[$"x{(gate.Number - 1).ToString().PadLeft(2, '0')}"];
 			var yGate_1 = allGAtes[$"y{(gate.Number - 1).ToString().PadLeft(2, '0')}"];
 
-			return this.TryAndGate(xGate_1, yGate_1, gate);
+			return this.TryOrGate(xGate_1, yGate_1, gate);
 		}
 		bool TryGate(Gate a, Gate b,Gate c1,Gate c2, Gate s)
 		{
@@ -179,6 +152,7 @@ namespace AdventOfCode2024
 				b.SetValue(variant.b);
 				c1.SetValue(variant.c);
 				c2.SetValue(variant.c);
+				this.Reset([a, b, c1, c2, s]);
 				if(s.GetValue() != variant.s)
 				{
 					return false;
@@ -187,25 +161,20 @@ namespace AdventOfCode2024
 			return true;
 		}
 
-		bool TryAndGate(Gate a, Gate b, Gate s)
+		bool TryOrGate(Gate a, Gate b, Gate s)
 		{
 			var variants = new List<(bool a, bool b, bool s)>()
 			{
 				(false,false,false),
-				(true,false,false),
-				(false,true,false),
+				(true,false,true),
+				(false,true,true),
 				(true,true,true),
 			};
 			foreach (var variant in variants)
 			{
 				a.SetValue(variant.a);
-				if (a.GetValue() != variant.a)
-				{
-				}
 				b.SetValue(variant.b);
-				if (b.GetValue() != variant.b)
-				{
-				}
+				this.Reset([a, b, s]);
 				if (s.GetValue() != variant.s)
 				{
 					return false;
@@ -225,13 +194,9 @@ namespace AdventOfCode2024
 			foreach (var variant in variants)
 			{
 				a.SetValue(variant.a);
-				if(a.GetValue() != variant.a)
-				{
-				}
 				b.SetValue(variant.b);
-				if (b.GetValue() != variant.b)
-				{
-				}
+			
+				this.Reset([a, b, s]);
 				if (s.GetValue() != variant.s)
 				{
 					return false;
@@ -251,125 +216,6 @@ namespace AdventOfCode2024
 			(true,true,false,false),
 			(true,true,true,true),
 		];
-
-
-		/*public string Second()
-		{
-			if(this.IsExample){ return  this.SecondResult; }
-			var gates = this.ParseInput();
-			var xvalue = this.GetValueFromGates(this.Filter(gates, 'x'));
-			var yvalue = this.GetValueFromGates(this.Filter(gates, 'y'));
-			
-			var gatesDictionary = gates.ToDictionary(x => x.Name);
-
-
-			var shouldBe = xvalue + yvalue;
-			var faultyZGates = gates
-				.Where(x => x.Name[0] == 'z')
-				.Where(x => x.Type != Types.XOR)
-				.Take(3)
-				.ToList();
-			var gatesWithXORAndNotInZ = gates
-				.Where(x => x.Type == Types.XOR)
-				.Where(x => x.Name[0] != 'z')
-				.ToList();
-			var gatesNotInZ = gates
-				.Where(x => x.Name[0] != 'z')
-				.ToList();
-
-
-			//WORKS
-			//var valueBeforeSwap = this.GetValueFromGates(this.Filter(gates, 'z'));
-			//var z08 = gatesDictionary["z08"];
-			//var ffj = gatesDictionary["ffj"];
-			//this.swap(z08, ffj);
-			//var newValue = this.GetValueFromGates(this.Filter(gates, 'z'));
-			
-
-			//WORKS
-			var valueBeforeSwap = this.GetValueFromGates(this.Filter(gates, 'z'));
-			var z08 = gatesDictionary["z08"];
-			var ffj = gatesDictionary["ffj"];
-			var _clones = this.Clone(gates).ToDictionary(x => x.Name);
-			this.swap(_clones[z08.Name], _clones[ffj.Name]);
-
-			var newValue = this.GetValueFromGates(this.Filter(_clones.Values.ToList(), 'z'));
-			
-
-
-			//38 sek med gatesWithXORAndNotInZ.Count ^ 3
-			//30 sek genom att ta bort clonen
-			//28 sek genom att skapa clonesDictionaryn 1 gång
-			var clones = gates.ToDictionary(x => x.Name);
-			var result = new List<string>();
-			for (var i0 = 0; i0 < gatesWithXORAndNotInZ.Count; i0++)
-			{
-				for (var i1 = 0; i1 < gatesWithXORAndNotInZ.Count; i1++)
-				{
-					for (var i2 = 0; i2 < gatesWithXORAndNotInZ.Count; i2++)
-					{
-						for (var g1 = 0; g1< gatesNotInZ.Count; g1++)
-						{
-							for (var g2 = 0; g2 < gatesNotInZ.Count; g2++)
-							{
-								tries++;
-								var z0 = faultyZGates[0];
-								var n0 = gatesWithXORAndNotInZ[i0];
-								this.swap(clones[z0.Name], clones[n0.Name]);
-
-								var z1 = faultyZGates[1];
-								var n1 = gatesWithXORAndNotInZ[i1];
-								this.swap(clones[z1.Name], clones[n1.Name]);
-
-								var z2 = faultyZGates[2];
-								var n2 = gatesWithXORAndNotInZ[i2];
-								this.swap(clones[z2.Name], clones[n2.Name]);
-
-								var z3 = gatesNotInZ[g1];
-								var n3 = gatesNotInZ[g2];
-								this.swap(clones[z3.Name], clones[n3.Name]);
-
-								this.ResetGates(clones.Values.ToList());
-								var value = this.GetValueFromGates(Filter(clones.Values.ToList(), 'z'));
-								if (value == shouldBe)
-								{
-									var key = this.GetKey([z0, z1, z2, z3, n0, n1, n2, n3]);
-									result.Add(key);
-									Console.WriteLine("Key found: " + key);
-								}
-								if (tries % 10000 == 0)
-								{
-									//7 346 100 188
-									var amouts = (Math.Pow(gatesWithXORAndNotInZ.Count, 3) * gatesNotInZ.Count * gatesNotInZ.Count);
-									double percent = (tries / amouts) * 100;
-									Console.WriteLine(Math.Round(percent, 10) + "%");
-								}
-								//Reset
-								this.swap(clones[z3.Name], clones[n3.Name]);
-								this.swap(clones[z2.Name], clones[n2.Name]);
-								this.swap(clones[z1.Name], clones[n1.Name]);
-								this.swap(clones[z0.Name], clones[n0.Name]);
-							}
-						}
-					}
-				}
-			}
-
-			Console.WriteLine("Count: "+result.Count);
-			Console.WriteLine("Distinct count: "+result.Distinct().Count());
-			return result
-				.OrderBy(x => x)
-				.FirstOrDefault() 
-				?? "";
-		}*/
-
-		string GetKey(List<Gate> gates)
-		{
-			return string.Join(",", gates
-				.Select(x => x.Name)
-				.OrderBy(x => x)
-				);
-		}
 		string GetKey(List<string> gates)
 		{
 			return string.Join(",", gates
@@ -377,11 +223,9 @@ namespace AdventOfCode2024
 				);
 		}
 
-		long tries = 0;
-
 		List<Gate> Filter(List<Gate>gates, char c)
 		{
-			return gates.Where(x => x.Name.ToLower().StartsWith(c)).OrderBy(x => x.Name).ToList();
+			return gates.Where(x => x.Name[0] == c).OrderBy(x => x.Name).ToList();
 		}
 	
 		HashSet<string> TopLevels = new HashSet<string>();
@@ -421,14 +265,6 @@ namespace AdventOfCode2024
 
 			return result;
 		}
-		void ResetGates(List<Gate> gates)
-		{
-			for (var i = 0; i < gates.Count; i++)
-			{
-				gates[i].Executed = false;
-			}
-		}
-
 		private List<Gate> ParseInput()
 		{
 			this.TopLevels.Clear();
