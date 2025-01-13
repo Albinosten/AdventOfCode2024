@@ -1,11 +1,9 @@
 ﻿
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AdventOfCode2024
 {
-	internal class Day24 : IPuzzle<long,string>
+	internal class Day24 : IPuzzle<long, string>
 	{
 		public bool IsExample { get; set; }
 		public long FirstResult => this.IsExample ? 2024 : 63168299811048;
@@ -18,25 +16,21 @@ namespace AdventOfCode2024
 		public long First()
 		{
 			var gates = this.ParseInput();
-			return this.GetValueFromGates(this.Filter(gates,'z'));
+			return this.GetValueFromGates(this.Filter(gates, 'z'));
 		}
 
 		public string Second()
 		{
-			if(this.IsExample){ return this.SecondResult; }
+			if (this.IsExample) { return this.SecondResult; }
 			var gates = this.ParseInput();
 
-			var gatesDictionary = gates.ToDictionary(x => x.Name);
-			//this.TryGate(gatesDictionary["z40"], gatesDictionary);
-
-			return this.Solve(gates,[])
+			return this.Solve(gates, [])
 				.Select(GetKey)
 				.OrderBy(x => x)
 				.ToList()
-				.FirstOrDefault() 
+				.FirstOrDefault()
 				?? "";
 		}
-		long tries = 0;
 		List<List<string>> Solve(List<Gate> gates, HashSet<string> swapKey)
 		{
 			var gatesDictionary = gates.ToDictionary(x => x.Name);
@@ -60,11 +54,6 @@ namespace AdventOfCode2024
 					{
 						for (int i1 = i0; i1 < gates.Count; i1++)
 						{
-							tries++;
-							if(tries % 1000 == 0)
-							{
-								Console.WriteLine(tries);
-							}
 							var clones = this.Clone(gates);
 							var clonesDictionary = clones.ToDictionary(x => x.Name);
 							
@@ -90,20 +79,12 @@ namespace AdventOfCode2024
 			return result;
 		}
 
-
-
-
-		void Reset(List<Gate> gates)
-		{
-			for(int i = 0; i <  gates.Count; i++)
-			{
-				gates[i].Executed = false;
-			}
-		}
 		//run to make sure swaping dont destroy anything before
 		bool CheckUpToNumber(int number, Dictionary<string, Gate> gatesDictionary)
 		{
-			var zGates = this.Filter(gatesDictionary.Values.ToList(), 'z').OrderBy(x => x.Name).ToList();
+			var zGates = this.Filter(gatesDictionary.Values.ToList(), 'z')
+				.OrderBy(x => x.Name)
+				.ToList();
 			for (var z = 0; z <= number; z++)
 			{
 				var zGate = zGates[z];
@@ -144,7 +125,7 @@ namespace AdventOfCode2024
 
 			return this.TryOrGate(xGate_1, yGate_1, gate);
 		}
-		bool TryGate(Gate a, Gate b,Gate c1,Gate c2, Gate s)
+		bool TryGate(Gate a, Gate b, Gate c1,Gate c2, Gate s)
 		{
 			foreach(var variant in this.GetTruthTable)
 			{
@@ -152,7 +133,6 @@ namespace AdventOfCode2024
 				b.SetValue(variant.b);
 				c1.SetValue(variant.c);
 				c2.SetValue(variant.c);
-				this.Reset([a, b, c1, c2, s]);
 				if(s.GetValue() != variant.s)
 				{
 					return false;
@@ -174,7 +154,6 @@ namespace AdventOfCode2024
 			{
 				a.SetValue(variant.a);
 				b.SetValue(variant.b);
-				this.Reset([a, b, s]);
 				if (s.GetValue() != variant.s)
 				{
 					return false;
@@ -195,8 +174,6 @@ namespace AdventOfCode2024
 			{
 				a.SetValue(variant.a);
 				b.SetValue(variant.b);
-			
-				this.Reset([a, b, s]);
 				if (s.GetValue() != variant.s)
 				{
 					return false;
@@ -256,7 +233,6 @@ namespace AdventOfCode2024
 			var result = 0L;
 			for (var i = 0; i < gates.Count; i++)
 			{
-				gates[i].Executed = false;
 				if (gates[i].GetValue())
 				{
 					result += 1L << i;
@@ -365,8 +341,6 @@ namespace AdventOfCode2024
 					IAmClone = true,
 					IsTopLevel = this.IsTopLevel,
 					Type = this.Type,
-					//value = this.value, //kanske?
-					Executed = false,
 					a = this.a,
 					b = this.b,
 					Number = this.Number,
@@ -377,11 +351,9 @@ namespace AdventOfCode2024
 				this.a = a;
 				this.b = b;
 			}
-			public bool Executed { get; set; }
 
 			public bool GetValue(HashSet<string>? visited = null)
 			{
-				//if (this.Executed) { return value; }
 				visited = visited ?? [];
 				if(this.a != null && !visited.Contains(this.Name))
 				{
@@ -390,23 +362,27 @@ namespace AdventOfCode2024
 					var bVisited = visited.ToHashSet();
 					bVisited.Add(this.Name);
 
-					var value = this.Function(this.a.GetValue(aVisited), this.b.GetValue(bVisited));
+					var value = this.Function(() => this.a.GetValue(aVisited), () => this.b.GetValue(bVisited));
+
 					this.SetValue(value);
 					return value;
 				}
-				this.SetValue(this.Function(this.value, this.value));
-				return this.Function(this.value,this.value);
+
+				this.SetValue(this.Function(() => this.value, () => this.value));
+				return this.Function(() => this.value, () => this.value);
 			}
-			Func<bool, bool, bool> function(Types type) => type switch
+
+			Func<Func<bool>, Func<bool>, bool> function(Types type) => type switch
 			{
+				Types.None => Gate.None,
 				Types.And => Gate.And,
 				Types.XOR => Gate.XOR,
 				Types.OR => Gate.Or,
-				Types.None => (bool a, bool b) =>this.None(a,b),
+				_ => throw new NotImplementedException(),
 			};
+
 			public void SetValue(bool value)
 			{
-				this.Executed = true;
 				this.value = value;
 			}
 			public bool IAmClone;
@@ -414,21 +390,23 @@ namespace AdventOfCode2024
 			public Gate a;
 			public Gate b;
 
-			private bool None(bool a, bool b){ return a; }
-			public Func<bool,bool,bool> Function { get; set; }
-			public static bool And(bool a, bool b)
+			public Func<Func<bool>, Func<bool>, bool> Function { get; set; }
+			public static bool None(Func<bool> a, Func<bool> b)
 			{
-				return a && b;
+				return a();
 			}
-			public static bool Or(bool a, bool b)
+			public static bool Or(Func<bool> a, Func<bool> b)
 			{
-				return a || b;
+				return a() || b();
 			}
-			public static bool XOR(bool a, bool b)
+			public static bool And(Func<bool> a, Func<bool> b)
 			{
-				return a ^ b;
+				return a() && b();
 			}
-
+			public static bool XOR(Func<bool> a, Func<bool> b)
+			{
+				return a() ^ b();
+			}
 		}
 	}
 }
